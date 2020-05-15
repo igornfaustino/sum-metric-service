@@ -2,6 +2,7 @@ const {
   addMetric,
   metrics,
   getTotalOfOneMetricForTheLastHour,
+  clearOldRecords,
 } = require('../helpers/metricHelper');
 const expect = require('chai').expect;
 
@@ -58,5 +59,50 @@ describe('get total of one metric', () => {
     const total = getTotalOfOneMetricForTheLastHour('test');
     expect(total).equals(12);
     done();
+  });
+});
+
+describe('remove old entries', () => {
+  describe('remove some entries', () => {
+    before((done) => {
+      clearMetrics();
+      const date2hoursAgo = new Date();
+      date2hoursAgo.setHours(date2hoursAgo.getHours() - 2);
+      metrics['test'] = [
+        { timestamp: date2hoursAgo.getTime(), value: 4 },
+        { timestamp: Date.now(), value: 3 },
+        { timestamp: Date.now(), value: 7 },
+        { timestamp: Date.now(), value: 2 },
+      ];
+      done();
+    });
+
+    it('should have an array without old entries', (done) => {
+      clearOldRecords();
+      expect(metrics['test']).to.have.length(3);
+      done();
+    });
+  });
+
+  describe('Remove all entries', () => {
+    before((done) => {
+      clearMetrics();
+      const date2hoursAgo = new Date();
+      date2hoursAgo.setHours(date2hoursAgo.getHours() - 2);
+      metrics['test'] = [
+        { timestamp: date2hoursAgo.getTime(), value: 4 },
+        { timestamp: date2hoursAgo.getTime(), value: 3 },
+        { timestamp: date2hoursAgo.getTime(), value: 7 },
+        { timestamp: date2hoursAgo.getTime(), value: 2 },
+      ];
+      done();
+    });
+
+    it('should have an empty array', (done) => {
+      clearOldRecords();
+      expect(metrics['test']).to.be.instanceOf(Array);
+      expect(metrics['test']).to.have.length(0);
+      done();
+    });
   });
 });
