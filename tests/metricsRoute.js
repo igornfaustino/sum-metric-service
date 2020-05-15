@@ -26,3 +26,15 @@ describe('POST metric', () => {
       });
   });
 });
+
+describe('GET metric', () => {
+  it('should have status 200', (done) => {
+    chai
+      .request(app)
+      .get('/metric/test')
+      .end((err, res) => {
+        expect(res).to.have.status(200);
+        done(err);
+      });
+  });
+});

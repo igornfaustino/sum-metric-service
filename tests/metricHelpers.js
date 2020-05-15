@@ -1,5 +1,12 @@
-const { addMetric } = require('../helpers/metricHelper');
+const {
+  addMetric,
+  metrics,
+  getTotalOfOneMetricForTheLastHour,
+} = require('../helpers/metricHelper');
 const expect = require('chai').expect;
+
+const clearMetrics = () =>
+  Object.keys(metrics).forEach((key) => delete metrics[key]);
 
 describe('add new metric', () => {
   it('should create a new key and add value', (done) => {
@@ -16,6 +23,40 @@ describe('add new metric', () => {
     expect(metrics).to.have.key('test');
     expect(metrics['test']).to.be.an.instanceof(Array);
     expect(metrics['test']).to.have.length(2);
+    done();
+  });
+});
+
+describe('get total of one empty metric', () => {
+  before((done) => {
+    clearMetrics();
+    done();
+  });
+
+  it("should return 0 if metric don't exist", (done) => {
+    const total = getTotalOfOneMetricForTheLastHour('test');
+    expect(total).equals(0);
+    done();
+  });
+});
+
+describe('get total of one metric', () => {
+  before((done) => {
+    clearMetrics();
+    const date2hoursAgo = new Date();
+    date2hoursAgo.setHours(date2hoursAgo.getHours() - 2);
+    metrics['test'] = [
+      { timestamp: date2hoursAgo.getTime(), value: 4 },
+      { timestamp: Date.now(), value: 3 },
+      { timestamp: Date.now(), value: 7 },
+      { timestamp: Date.now(), value: 2 },
+    ];
+    done();
+  });
+
+  it('should return the total of the last hour', (done) => {
+    const total = getTotalOfOneMetricForTheLastHour('test');
+    expect(total).equals(12);
     done();
   });
 });

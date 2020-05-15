@@ -10,4 +10,17 @@ const addMetric = (key, value) => {
   return metrics;
 };
 
-module.exports = { addMetric };
+const getTotalOfOneMetricForTheLastHour = (key) => {
+  if (!metrics[key]) return 0;
+
+  const timestampThreshold = new Date();
+  timestampThreshold.setHours(timestampThreshold.getHours() - 1);
+
+  return metrics[key]
+    .filter(({ timestamp }) => timestampThreshold.getTime() <= timestamp)
+    .reduce((acc, { value }) => {
+      return acc + value;
+    }, 0);
+};
+
+module.exports = { addMetric, getTotalOfOneMetricForTheLastHour, metrics };
