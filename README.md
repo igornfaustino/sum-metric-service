@@ -11,7 +11,7 @@ url: /metric/:key
 body: { value: 10 }
 ```
 
-GET: gettotal of the most recent values
+GET: get total of the most recent values
 
 ```
 url: /metric/:key
